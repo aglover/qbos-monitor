@@ -37,6 +37,18 @@ public class QBosMonitorConfiguration extends BaseAdapterConfiguration {
         addRequiredKeys(getRequiredKeySet());
     }
 
+    public String getAWSKey(){
+        return getProperty(AWS_KEY);
+    }
+
+    public String getAWSSecret(){
+        return getProperty(AWS_SECRET);
+    }
+
+    public String getAWSQueueName(){
+        return getProperty(AWS_QUEUE_NAME);
+    }
+
     private Set<String> getRequiredKeySet() {
         return unmodifiableSet(new HashSet<String>(Arrays.asList(AWS_KEY, AWS_SECRET, AWS_QUEUE_NAME)));
     }
