@@ -1,22 +1,19 @@
 <adapter-metadata>
     <description></description>
-    <class-name>com.windward.qbosatt.QbosAdapter</class-name>
+    <class-name>com.windward.qbosatt.monitor.QBosMonitor</class-name>
     <adapter-jar>@ant.project.name@-@version@.jar</adapter-jar>
     <required-jars>
-        <required-jar>com.qbos.QTP.jar</required-jar>
+        <required-jar>aws-java-sdk-1.5.5.jar</required-jar>
         <required-jar>commons-lang-2.3.jar</required-jar>
-        <required-jar>axis-jaxrpc-1.4.jar</required-jar>
-        <required-jar>com.springsource.org.apache.axis-1.4.0.jar</required-jar>
-        <required-jar>joda-time-2.2.jar</required-jar>
-        <required-jar>json-simple-1.1.1.jar</required-jar>
-        <required-jar>com.springsource.javax.activation-1.1.1.jar</required-jar>
-        <required-jar>com.springsource.javax.jms-1.1.0.jar</required-jar>
-        <required-jar>com.springsource.javax.mail-1.4.5.jar</required-jar>
-        <required-jar>com.springsource.javax.wsdl-1.6.1.jar</required-jar>
-        <required-jar>com.springsource.javax.xml.rpc-1.1.0.v20110517.jar</required-jar>
-        <required-jar>com.springsource.javax.xml.soap-1.3.0.jar</required-jar>
-        <required-jar>com.springsource.org.apache.commons.codec-1.6.0.jar</required-jar>
-        <required-jar>commons-discovery-0.5.jar</required-jar>
+        <required-jar>aws-java-sdk-1.5.5.jar</required-jar>
+        <required-jar>commons-codec-1.3.jar</required-jar>
+        <required-jar>commons-logging-1.1.1.jar</required-jar>
+        <required-jar>httpclient-4.2.3.jar</required-jar>
+        <required-jar>httpcore-4.2.jar</required-jar>
+        <required-jar>jackson-core-asl-1.8.7.jar</required-jar>
+        <required-jar>jackson-mapper-asl-1.8.7.jar</required-jar>
+        <required-jar>stax-1.2.0.jar</required-jar>
+        <required-jar>stax-api-1.0.1.jar</required-jar>
 
 
     </required-jars>
