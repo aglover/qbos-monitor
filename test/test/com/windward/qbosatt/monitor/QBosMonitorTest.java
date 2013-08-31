@@ -7,9 +7,8 @@ import com.b50.sqs.MessageSentCallback;
 import com.b50.sqs.SQSAdapter;
 import com.windward.qbosatt.monitor.QBosMonitor;
 import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -22,15 +21,15 @@ public class QBosMonitorTest {
     @Test
     public void testMonitor() throws Exception {
         AmazonSQSClient mockClient = mock(AmazonSQSClient.class);
-        SQSAdapter adapter = new MockSQSAdapter(mockClient, "test_queue");
+        MockSQSAdapter adapter = new MockSQSAdapter(mockClient, "test_queue");
         QBosMonitor monitor = new QBosMonitor();
         monitor.setSQSAdapter(adapter);
         monitor.initialize(null);
         Thread t = new Thread(monitor, "TestSampleAdapter");
         t.start();
-
         Thread.sleep(2000);
         monitor.shutdown();
+        assertEquals("callback wasn't invoked", true, adapter.wasInvoked());
     }
 
     /**
@@ -41,6 +40,8 @@ public class QBosMonitorTest {
      */
     public static class MockSQSAdapter extends SQSAdapter {
 
+        private boolean invoked = false;
+
         public MockSQSAdapter(AmazonSQS sqs, String queueURL) {
             super(sqs, queueURL);
 
@@ -50,9 +51,15 @@ public class QBosMonitorTest {
             super(null, awsSecret, queueName);
         }
 
+        public boolean wasInvoked() {
+            return invoked;
+        }
+
         @Override
         public void receive(MessageReceivedCallback callback) {
-
+            if (callback != null) {
+                invoked = true;
+            }
         }
 
         @Override
