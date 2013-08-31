@@ -20,10 +20,13 @@ public class QBosMonitor extends AbstractMonitorAdapter {
 
     private QBosMonitorConfiguration configuration;
     private boolean continueToMonitor;
+    private SQSAdapter ahoy;
 
     @Override
     public void initialize(AdapterManager aAdapterManager) {
-        configuration = (QBosMonitorConfiguration) getConfiguration();
+        if (getConfiguration() instanceof QBosMonitorConfiguration) {
+            configuration = (QBosMonitorConfiguration) getConfiguration();
+        }
         continueToMonitor = true;
     }
 
@@ -35,11 +38,7 @@ public class QBosMonitor extends AbstractMonitorAdapter {
     @Override
     public void run() {
 
-        String queueName = configuration.getAWSQueueName();
-        String awsKey = configuration.getAWSKey();
-        String awsSecret = configuration.getAWSSecret();
-
-        SQSAdapter ahoy = new SQSAdapter(awsKey, awsSecret, queueName);
+        ahoy = getSqsAdapter();
 
         while (continueToMonitor) {
             ahoy.receive(new MessageReceivedCallback() {
@@ -60,6 +59,21 @@ public class QBosMonitor extends AbstractMonitorAdapter {
                 //bad issue, bail out
                 continueToMonitor = false;
             }
+        }
+    }
+
+    public void setSQSAdapter(SQSAdapter instance) {
+        ahoy = instance;
+    }
+
+    private SQSAdapter getSqsAdapter() {
+        if (ahoy == null) {
+            String queueName = configuration.getAWSQueueName();
+            String awsKey = configuration.getAWSKey();
+            String awsSecret = configuration.getAWSSecret();
+            return new SQSAdapter(awsKey, awsSecret, queueName);
+        } else {
+            return ahoy;
         }
     }
 }

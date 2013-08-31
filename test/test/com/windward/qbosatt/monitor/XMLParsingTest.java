@@ -23,7 +23,6 @@ public class XMLParsingTest {
                 "    <Lifecycle>approved</Lifecycle>\n" +
                 "</Event>";
         XML xml = XML.read(new StringReader(rawXML));
-
         assertNotNull(xml);
     }
 }
