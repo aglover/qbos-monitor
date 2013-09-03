@@ -43,7 +43,7 @@ public class QBosMonitor extends AbstractMonitorAdapter {
         setState(StateEnum.RUNNING);
         ahoy = getSqsAdapter();
 
-        while (continueToMonitor) {
+        while (continueToMonitor && getState() == StateEnum.RUNNING) {
             ahoy.receive(new MessageReceivedCallback() {
                 @Override
                 public void onReceive(String id, String body) {
