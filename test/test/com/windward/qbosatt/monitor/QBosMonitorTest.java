@@ -25,7 +25,7 @@ public class QBosMonitorTest {
         QBosMonitor monitor = new QBosMonitor();
         monitor.setSQSAdapter(adapter);
         monitor.initialize(null);
-        Thread t = new Thread(monitor, "TestSampleAdapter");
+        Thread t = new Thread(monitor, "QBosMonitorTesting");
         t.start();
         Thread.sleep(2000);
         monitor.shutdown();

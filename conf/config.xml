@@ -14,7 +14,6 @@
         <required-jar>jackson-mapper-asl-1.8.7.jar</required-jar>
         <required-jar>stax-1.2.0.jar</required-jar>
         <required-jar>stax-api-1.0.1.jar</required-jar>
-
-
+        <required-jar>sqs-adapter-1.0.jar</required-jar>
     </required-jars>
 </adapter-metadata>
