@@ -16,25 +16,28 @@ import static java.util.Collections.unmodifiableSet;
  * Date: 8/27/13
  * Time: 11:59 AM
  */
-public class QBosMonitorConfiguration extends BaseAdapterConfiguration {
+public class QbosMonitorConfiguration extends BaseAdapterConfiguration {
 
     private final String AWS_KEY = "aws-key";
     private final String AWS_SECRET = "aws-secret";
     private final String AWS_QUEUE_NAME = "aws-queue-name";
 
-    public QBosMonitorConfiguration(String id, Hashtable defaults) throws AdapterConfigurationException {
+    public QbosMonitorConfiguration(String id, Hashtable defaults)  {
         super(id, defaults);
-        addRequiredKeys(getRequiredKeySet());
+        addValidKeys(getRequiredKeySet());
+//        addRequiredKeys(getRequiredKeySet());
     }
 
-    public QBosMonitorConfiguration(String id, Hashtable defaults, Set validKeys, Set requiredKeys) throws AdapterConfigurationException {
+    public QbosMonitorConfiguration(String id, Hashtable defaults, Set validKeys, Set requiredKeys) throws AdapterConfigurationException {
         super(id, defaults, validKeys, requiredKeys);
-        addRequiredKeys(getRequiredKeySet());
+        addValidKeys(getRequiredKeySet());
+//        addRequiredKeys(getRequiredKeySet());
     }
 
-    public QBosMonitorConfiguration(String adapterId) throws AdapterConfigurationException {
+    public QbosMonitorConfiguration(String adapterId)  {
         super(adapterId);
-        addRequiredKeys(getRequiredKeySet());
+        addValidKeys(getRequiredKeySet());
+//        addRequiredKeys(getRequiredKeySet());
     }
 
     public String getAWSKey(){

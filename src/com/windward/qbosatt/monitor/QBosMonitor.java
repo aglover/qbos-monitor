@@ -18,43 +18,45 @@ import java.io.StringReader;
  * Date: 8/27/13
  * Time: 11:20 AM
  */
-public class QBosMonitor extends AbstractMonitorAdapter {
+public class QbosMonitor extends AbstractMonitorAdapter {
 
-    private static Logger LOGGER = Logger.getLogger(QBosMonitor.class);
-    private QBosMonitorConfiguration configuration;
+    private static Logger LOGGER = Logger.getLogger(QbosMonitor.class);
+    private QbosMonitorConfiguration configuration;
     private boolean continueToMonitor;
     private SQSAdapter ahoy;
 
     @Override
     public void initialize(AdapterManager aAdapterManager) {
-        if (getConfiguration() instanceof QBosMonitorConfiguration) {
-            configuration = (QBosMonitorConfiguration) getConfiguration();
+        super.initialize(aAdapterManager);
+        if (getConfiguration() instanceof QbosMonitorConfiguration) {
+            configuration = (QbosMonitorConfiguration) getConfiguration();
         }
         continueToMonitor = true;
         setState(StateEnum.STARTING);
-        LOGGER.debug("QBosMonitor has initialized");
+        LOGGER.error("QbosMonitor has initialized");
     }
 
     @Override
     public void shutdown() throws AdapterException {
         continueToMonitor = false;
         setState(StateEnum.STOPPING);
-        LOGGER.debug("QBosMonitor has shutdown");
+        LOGGER.error("QbosMonitor has shutdown");
     }
 
     @Override
     public void run() {
-        LOGGER.debug("QBosMonitor run method invoked");
+        continueToMonitor=true;
+        LOGGER.error("QbosMonitor run method invoked");
         setState(StateEnum.RUNNING);
         ahoy = getSqsAdapter();
 
         while (continueToMonitor && getState() == StateEnum.RUNNING) {
-            LOGGER.debug("QBosMonitor is in while loop, about to invoke ahoy.receive");
+            LOGGER.error("QbosMonitor is in while loop, about to invoke ahoy.receive");
             ahoy.receive(new MessageReceivedCallback() {
                 @Override
                 public void onReceive(String id, String body) {
                     try {
-                        LOGGER.debug("onReceive callback invoked! About to send event for this body: " + body);
+                        LOGGER.error("onReceive callback invoked! About to send event for this body: " + body);
                         sendEvent("QBos", XML.read(new StringReader(body)));
                     } catch (InvalidXMLFormatException e) {
                         //TODO: how does one handle an error when parsing XML inside a monitor?
@@ -79,13 +81,20 @@ public class QBosMonitor extends AbstractMonitorAdapter {
     }
 
     private SQSAdapter getSqsAdapter() {
-        if (ahoy == null) {
-            String queueName = configuration.getAWSQueueName();
-            String awsKey = configuration.getAWSKey();
-            String awsSecret = configuration.getAWSSecret();
-            return new SQSAdapter(awsKey, awsSecret, queueName);
-        } else {
-            return ahoy;
+        try {
+            if (ahoy == null) {
+                LOGGER.error("QbosMonitor AWS key: "+this.getConfiguration().getProperty("aws-key"));
+                QbosMonitorConfiguration conf = (QbosMonitorConfiguration) this.getConfiguration();
+                String queueName = conf.getAWSQueueName();
+                String awsKey = conf.getAWSKey();
+                String awsSecret = conf.getAWSSecret();
+                ahoy =  new SQSAdapter(awsKey, awsSecret, queueName);
+            }
+        } catch (Exception e){
+            LOGGER.error("QbosMonitor Exception connecting to SQS: " + e.getLocalizedMessage(), e);
+            continueToMonitor = false;
+            setState(StateEnum.FAULT);
         }
+        return ahoy;
     }
 }

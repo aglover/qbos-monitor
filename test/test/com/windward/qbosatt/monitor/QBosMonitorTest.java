@@ -5,7 +5,7 @@ import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.b50.sqs.MessageReceivedCallback;
 import com.b50.sqs.MessageSentCallback;
 import com.b50.sqs.SQSAdapter;
-import com.windward.qbosatt.monitor.QBosMonitor;
+import com.windward.qbosatt.monitor.QbosMonitor;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -22,7 +22,7 @@ public class QBosMonitorTest {
     public void testMonitor() throws Exception {
         AmazonSQSClient mockClient = mock(AmazonSQSClient.class);
         MockSQSAdapter adapter = new MockSQSAdapter(mockClient, "test_queue");
-        QBosMonitor monitor = new QBosMonitor();
+        QbosMonitor monitor = new QbosMonitor();
         monitor.setSQSAdapter(adapter);
         monitor.initialize(null);
         Thread t = new Thread(monitor, "QBosMonitorTesting");

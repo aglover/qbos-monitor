@@ -1,6 +1,6 @@
 <adapter-metadata>
     <description></description>
-    <class-name>com.windward.qbosatt.monitor.QBosMonitor</class-name>
+    <class-name>com.windward.qbosatt.monitor.QbosMonitor</class-name>
     <adapter-jar>@ant.project.name@-@version@.jar</adapter-jar>
     <required-jars>
         <required-jar>commons-lang-2.3.jar</required-jar>
