@@ -3,7 +3,6 @@
     <class-name>com.windward.qbosatt.monitor.QBosMonitor</class-name>
     <adapter-jar>@ant.project.name@-@version@.jar</adapter-jar>
     <required-jars>
-        <required-jar>aws-java-sdk-1.5.5.jar</required-jar>
         <required-jar>commons-lang-2.3.jar</required-jar>
         <required-jar>aws-java-sdk-1.5.5.jar</required-jar>
         <required-jar>commons-codec-1.3.jar</required-jar>
