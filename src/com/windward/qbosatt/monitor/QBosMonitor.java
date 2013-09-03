@@ -2,6 +2,7 @@ package com.windward.qbosatt.monitor;
 
 import com.b50.sqs.MessageReceivedCallback;
 import com.b50.sqs.SQSAdapter;
+import com.realops.common.enumeration.StateEnum;
 import com.realops.common.xml.InvalidXMLFormatException;
 import com.realops.common.xml.XML;
 import com.realops.foundation.adapterframework.AbstractMonitorAdapter;
@@ -28,16 +29,18 @@ public class QBosMonitor extends AbstractMonitorAdapter {
             configuration = (QBosMonitorConfiguration) getConfiguration();
         }
         continueToMonitor = true;
+        setState(StateEnum.STARTING);
     }
 
     @Override
     public void shutdown() throws AdapterException {
         continueToMonitor = false;
+        setState(StateEnum.STOPPING);
     }
 
     @Override
     public void run() {
-
+        setState(StateEnum.RUNNING);
         ahoy = getSqsAdapter();
 
         while (continueToMonitor) {
@@ -58,6 +61,7 @@ public class QBosMonitor extends AbstractMonitorAdapter {
             } catch (InterruptedException e) {
                 //bad issue, bail out
                 continueToMonitor = false;
+                setState(StateEnum.FAULT);
             }
         }
     }
