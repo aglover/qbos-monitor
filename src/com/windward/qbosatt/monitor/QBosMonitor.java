@@ -36,6 +36,10 @@ public class QbosMonitor extends AbstractMonitorAdapter {
         LOGGER.error("QbosMonitor has initialized");
     }
 
+    public boolean isConfigured() {
+        return (configuration != null) ? true : false;
+    }
+
     @Override
     public void shutdown() throws AdapterException {
         continueToMonitor = false;
@@ -45,7 +49,7 @@ public class QbosMonitor extends AbstractMonitorAdapter {
 
     @Override
     public void run() {
-        continueToMonitor=true;
+        continueToMonitor = true;
         LOGGER.error("QbosMonitor run method invoked");
         setState(StateEnum.RUNNING);
         ahoy = getSqsAdapter();
@@ -83,14 +87,14 @@ public class QbosMonitor extends AbstractMonitorAdapter {
     private SQSAdapter getSqsAdapter() {
         try {
             if (ahoy == null) {
-                LOGGER.error("QbosMonitor AWS key: "+this.getConfiguration().getProperty("aws-key"));
+                LOGGER.error("QbosMonitor AWS key: " + this.getConfiguration().getProperty("aws-key"));
                 QbosMonitorConfiguration conf = (QbosMonitorConfiguration) this.getConfiguration();
                 String queueName = conf.getAWSQueueName();
                 String awsKey = conf.getAWSKey();
                 String awsSecret = conf.getAWSSecret();
-                ahoy =  new SQSAdapter(awsKey, awsSecret, queueName);
+                ahoy = new SQSAdapter(awsKey, awsSecret, queueName);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             LOGGER.error("QbosMonitor Exception connecting to SQS: " + e.getLocalizedMessage(), e);
             continueToMonitor = false;
             setState(StateEnum.FAULT);

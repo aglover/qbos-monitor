@@ -5,10 +5,13 @@ import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.b50.sqs.MessageReceivedCallback;
 import com.b50.sqs.MessageSentCallback;
 import com.b50.sqs.SQSAdapter;
+import com.realops.foundation.adapterframework.AdapterEvent;
+import com.realops.foundation.adapterframework.AdapterManager;
 import com.windward.qbosatt.monitor.QbosMonitor;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -30,6 +33,21 @@ public class QBosMonitorTest {
         Thread.sleep(2000);
         monitor.shutdown();
         assertEquals("callback wasn't invoked", true, adapter.wasInvoked());
+    }
+
+    public void testMonitorConfiguration() throws Exception {
+        AmazonSQSClient mockClient = mock(AmazonSQSClient.class);
+        MockSQSAdapter adapter = new MockSQSAdapter(mockClient, "test_queue");
+        QbosMonitor monitor = new QbosMonitor();
+        monitor.initialize(new MockAdapterManager());
+        assertTrue("monitor wasn't configured", monitor.isConfigured());
+    }
+
+    public static class MockAdapterManager extends AdapterManager {
+        @Override
+        public void sendEvent(AdapterEvent event) {
+            //
+        }
     }
 
     /**
