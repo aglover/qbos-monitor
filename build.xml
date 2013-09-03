@@ -1,6 +1,6 @@
 <project name="qbos-monitor" basedir="." default="jar">
 
-    <property name="version" value="1.0.4"/>
+    <property name="version" value="1.0.5"/>
     <property name="lib.dir" value="lib"/>
     <property name="build.dir" value="target"/>
     <property name="build.test.dir" value="${build.dir}/test"/>
