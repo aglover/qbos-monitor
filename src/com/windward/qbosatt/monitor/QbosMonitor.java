@@ -12,6 +12,7 @@ import com.realops.foundation.adapterframework.configuration.BaseAdapterConfigur
 import org.apache.log4j.Logger;
 
 import java.io.StringReader;
+import java.util.Enumeration;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,9 +30,18 @@ public class QbosMonitor extends AbstractMonitorAdapter {
     @Override
     public void initialize(AdapterManager aAdapterManager) {
         super.initialize(aAdapterManager);
-        if (getConfiguration() instanceof BaseAdapterConfiguration) {
-            configuration =  getConfiguration();
+//        if (getConfiguration() instanceof BaseAdapterConfiguration) {
+        Enumeration enumeration = getConfiguration().getKeys();
+        while (enumeration.hasMoreElements()) {
+            String param = (String) enumeration.nextElement();
+            System.out.println("enumeration of keys is " + param);
         }
+        for (Object key : getConfiguration().getValidKeys()) {
+            LOGGER.error("key obtained is " + key.toString());
+            LOGGER.error("value for key is " + getConfiguration().getProperty(key.toString()));
+        }
+        configuration = getConfiguration();
+//        }
         continueToMonitor = true;
         setState(StateEnum.STARTING);
         LOGGER.error("QbosMonitor has initialized");
@@ -88,10 +98,19 @@ public class QbosMonitor extends AbstractMonitorAdapter {
     private SQSAdapter getSqsAdapter() {
         try {
             if (ahoy == null) {
+                Enumeration enumeration = getConfiguration().getKeys();
+                while (enumeration.hasMoreElements()) {
+                    String param = (String) enumeration.nextElement();
+                    System.out.println("enumeration of keys is " + param);
+                }
+                for (Object key : getConfiguration().getValidKeys()) {
+                    LOGGER.error("key obtained is " + key.toString());
+                    LOGGER.error("value for key is " + getConfiguration().getProperty(key.toString()));
+                }
                 LOGGER.error("QbosMonitor AWS key: " + this.getConfiguration().getProperty("aws-key"));
 //                QbosMonitorConfiguration conf = (QbosMonitorConfiguration) this.getConfiguration();
-                String queueName = configuration.getProperty("aws-queue-name")  ;
-                String awsKey = configuration.getProperty("aws-key")    ;
+                String queueName = configuration.getProperty("aws-queue-name");
+                String awsKey = configuration.getProperty("aws-key");
                 String awsSecret = configuration.getProperty("aws-secret");
                 ahoy = new SQSAdapter(awsKey, awsSecret, queueName);
             }
