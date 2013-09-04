@@ -31,7 +31,10 @@ public class QbosMonitor extends AbstractMonitorAdapter {
     public void initialize(AdapterManager aAdapterManager) {
         super.initialize(aAdapterManager);
 //        if (getConfiguration() instanceof BaseAdapterConfiguration) {
-        System.out.println("XML is " + getConfiguration().toXML().toPrettyString());
+        try {
+            System.out.println("XML is " + getConfiguration().toXML().toPrettyString());
+        } catch (Exception e) {
+        }
         Enumeration enumeration = getConfiguration().getKeys();
         while (enumeration.hasMoreElements()) {
             String param = (String) enumeration.nextElement();
@@ -99,7 +102,10 @@ public class QbosMonitor extends AbstractMonitorAdapter {
     private SQSAdapter getSqsAdapter() {
         try {
             if (ahoy == null) {
-                System.out.println("XML is " + getConfiguration().toXML().toPrettyString());
+                try {
+                    System.out.println("XML is " + getConfiguration().toXML().toPrettyString());
+                } catch (Exception e) {
+                }
                 Enumeration enumeration = getConfiguration().getKeys();
                 while (enumeration.hasMoreElements()) {
                     String param = (String) enumeration.nextElement();
