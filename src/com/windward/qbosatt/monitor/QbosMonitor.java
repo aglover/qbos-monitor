@@ -12,7 +12,6 @@ import com.realops.foundation.adapterframework.configuration.BaseAdapterConfigur
 import org.apache.log4j.Logger;
 
 import java.io.StringReader;
-import java.util.Enumeration;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,22 +29,7 @@ public class QbosMonitor extends AbstractMonitorAdapter {
     @Override
     public void initialize(AdapterManager aAdapterManager) {
         super.initialize(aAdapterManager);
-//        if (getConfiguration() instanceof BaseAdapterConfiguration) {
-        try {
-            System.out.println("XML is " + getConfiguration().toXML().toPrettyString());
-        } catch (Exception e) {
-        }
-        Enumeration enumeration = getConfiguration().getKeys();
-        while (enumeration.hasMoreElements()) {
-            String param = (String) enumeration.nextElement();
-            System.out.println("enumeration of keys is " + param);
-        }
-        for (Object key : getConfiguration().getValidKeys()) {
-            LOGGER.error("key obtained is " + key.toString());
-            LOGGER.error("value for key is " + getConfiguration().getProperty(key.toString()));
-        }
         configuration = getConfiguration();
-//        }
         continueToMonitor = true;
         setState(StateEnum.STARTING);
         LOGGER.error("QbosMonitor has initialized");
@@ -62,59 +46,43 @@ public class QbosMonitor extends AbstractMonitorAdapter {
         LOGGER.error("QbosMonitor has shutdown");
     }
 
-    private void printConfig(){
-      try {
-          LOGGER.error("XML is " + getConfiguration().toXML().toPrettyString());
-      } catch (Exception e) {
-        LOGGER.error("Can't print the xml for config");
-      }
-      Enumeration enumeration = getConfiguration().getKeys();
-      while (enumeration.hasMoreElements()) {
-          String param = (String) enumeration.nextElement();
-          LOGGER.error("enumeration of keys is " + param);
-      }
-      for (Object key : getConfiguration().getValidKeys()) {
-          LOGGER.error("valid key obtained is " + key.toString());
-          LOGGER.error("value for key is " + getConfiguration().getProperty(key.toString()));
-      }
-      
-    }
-
     public String getAdapterConfigurationClassName() {
         return QbosMonitorConfiguration.class.getName();
     }
 
     @Override
     public void run() {
-        this.printConfig();
-        continueToMonitor = true;
-        LOGGER.error("QbosMonitor run method invoked");
-        setState(StateEnum.RUNNING);
-        ahoy = getSqsAdapter();
-
-        while (continueToMonitor && getState() == StateEnum.RUNNING) {
-            LOGGER.error("QbosMonitor is in while loop, about to invoke ahoy.receive");
-            ahoy.receive(new MessageReceivedCallback() {
-                @Override
-                public void onReceive(String id, String body) {
-                    try {
-                        LOGGER.error("onReceive callback invoked! About to send event for this body: " + body);
-                        sendEvent("QBos", XML.read(new StringReader(body)));
-                    } catch (InvalidXMLFormatException e) {
-                        //TODO: how does one handle an error when parsing XML inside a monitor?
-                        e.printStackTrace();
+        try {
+            LOGGER.error("QbosMonitor run method invoked");
+            setState(StateEnum.RUNNING);
+            ahoy = getSqsAdapter();
+            LOGGER.error("Ahoy instance is " + ahoy + " continueToMonitor is " + continueToMonitor
+                    + " and state is " + getState().toString());
+            while (continueToMonitor && getState() == StateEnum.RUNNING) {
+                LOGGER.error("QbosMonitor is in while loop, about to invoke ahoy.receive");
+                ahoy.receive(new MessageReceivedCallback() {
+                    @Override
+                    public void onReceive(String id, String body) {
+                        try {
+                            LOGGER.error("onReceive callback invoked! About to send event for this body: " + body);
+                            sendEvent("QBos", XML.read(new StringReader(body)));
+                        } catch (InvalidXMLFormatException e) {
+                            //TODO: how does one handle an error when parsing XML inside a monitor?
+                            LOGGER.error("QbosMonitor InvalidXMLFormatException! ", e);
+                        }
                     }
-                }
-            });
+                });
 
-            try {
-                Thread.sleep(60000); //1 minute
-            } catch (InterruptedException e) {
-                LOGGER.error("Exception in run() -- bad news", e);
-                //bad issue, bail out
-                continueToMonitor = false;
-                setState(StateEnum.FAULT);
+                try {
+                    Thread.sleep(60000); //1 minute
+                } catch (InterruptedException e) {
+                    LOGGER.error("Exception in run() -- bad news", e);
+                    continueToMonitor = false;
+                    setState(StateEnum.FAULT);
+                }
             }
+        } catch (Exception e) {
+            LOGGER.error("QbosMonitor Exception! ", e);
         }
     }
 
@@ -125,21 +93,6 @@ public class QbosMonitor extends AbstractMonitorAdapter {
     private SQSAdapter getSqsAdapter() {
         try {
             if (ahoy == null) {
-                try {
-                    System.out.println("XML is " + getConfiguration().toXML().toPrettyString());
-                } catch (Exception e) {
-                }
-                Enumeration enumeration = getConfiguration().getKeys();
-                while (enumeration.hasMoreElements()) {
-                    String param = (String) enumeration.nextElement();
-                    System.out.println("enumeration of keys is " + param);
-                }
-                for (Object key : getConfiguration().getValidKeys()) {
-                    LOGGER.error("key obtained is " + key.toString());
-                    LOGGER.error("value for key is " + getConfiguration().getProperty(key.toString()));
-                }
-                LOGGER.error("QbosMonitor AWS key: " + this.getConfiguration().getProperty("aws-key"));
-//                QbosMonitorConfiguration conf = (QbosMonitorConfiguration) this.getConfiguration();
                 String queueName = configuration.getProperty("aws-queue-name");
                 String awsKey = configuration.getProperty("aws-key");
                 String awsSecret = configuration.getProperty("aws-secret");

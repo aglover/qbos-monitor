@@ -19,52 +19,41 @@ import static java.util.Collections.unmodifiableSet;
  */
 public class QbosMonitorConfiguration extends BaseAdapterConfiguration {
 
+    private static Logger LOGGER = Logger.getLogger(QbosMonitorConfiguration.class);
     private final String AWS_KEY = "aws-key";
     private final String AWS_SECRET = "aws-secret";
     private final String AWS_QUEUE_NAME = "aws-queue-name";
-    private static Logger LOGGER = Logger.getLogger(QbosMonitorConfiguration.class);
 
-    public QbosMonitorConfiguration(String id, Hashtable defaults)  {
+    public QbosMonitorConfiguration(String id, Hashtable defaults) {
         super(id, defaults);
-//        addValidKeys(getRequiredKeySet());
         addValidKey(AWS_KEY);
         addValidKey(AWS_SECRET);
         addValidKey(AWS_QUEUE_NAME);
-//        addRequiredKeys(getRequiredKeySet());
     }
 
     public QbosMonitorConfiguration(String id, Hashtable defaults, Set validKeys, Set requiredKeys) throws AdapterConfigurationException {
         super(id, defaults, validKeys, requiredKeys);
-//        addValidKeys(getRequiredKeySet());
         addValidKey(AWS_KEY);
         addValidKey(AWS_SECRET);
         addValidKey(AWS_QUEUE_NAME);
-//        addRequiredKeys(getRequiredKeySet());
     }
 
-    public QbosMonitorConfiguration(String adapterId)  {
+    public QbosMonitorConfiguration(String adapterId) {
         super(adapterId);
-//        addValidKeys(getRequiredKeySet());
         addValidKey(AWS_KEY);
         addValidKey(AWS_SECRET);
         addValidKey(AWS_QUEUE_NAME);
-//        addRequiredKeys(getRequiredKeySet());
     }
 
-    @Override
-    public void setProperty(String key, String value){
-        LOGGER.error("Set property " +key+ " vlaue " +value);
-        super.setProperty(key, value);
-    }
-    public String getAWSKey(){
+    public String getAWSKey() {
         return getProperty(AWS_KEY);
     }
 
-    public String getAWSSecret(){
+    public String getAWSSecret() {
         return getProperty(AWS_SECRET);
     }
 
-    public String getAWSQueueName(){
+    public String getAWSQueueName() {
         return getProperty(AWS_QUEUE_NAME);
     }
 
