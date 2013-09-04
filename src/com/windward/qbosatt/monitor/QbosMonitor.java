@@ -62,8 +62,31 @@ public class QbosMonitor extends AbstractMonitorAdapter {
         LOGGER.error("QbosMonitor has shutdown");
     }
 
+    private void printConfig(){
+      try {
+          LOGGER.error("XML is " + getConfiguration().toXML().toPrettyString());
+      } catch (Exception e) {
+        LOGGER.error("Can't print the xml for config");
+      }
+      Enumeration enumeration = getConfiguration().getKeys();
+      while (enumeration.hasMoreElements()) {
+          String param = (String) enumeration.nextElement();
+          LOGGER.error("enumeration of keys is " + param);
+      }
+      for (Object key : getConfiguration().getValidKeys()) {
+          LOGGER.error("valid key obtained is " + key.toString());
+          LOGGER.error("value for key is " + getConfiguration().getProperty(key.toString()));
+      }
+      
+    }
+
+    public String getAdapterConfigurationClassName() {
+        return QbosMonitorConfiguration.class.getName();
+    }
+
     @Override
     public void run() {
+        this.printConfig();
         continueToMonitor = true;
         LOGGER.error("QbosMonitor run method invoked");
         setState(StateEnum.RUNNING);

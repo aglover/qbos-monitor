@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<a:ConfigDescriptor xmlns:a="http://bmc.com/ao/xsd/2010/10/configDescriptor">
+
+    <a:StringInput name="aws-key">
+        <a:Explanation>AWS access credentials. The Access Key ID is 20 alpha-numeric characters like 022QF06E7MXBSH9DHM02 and is not secret.
+        </a:Explanation>
+    </a:StringInput>
+
+    <a:StringInput name="aws-secret">
+        <a:Explanation>AWS access credentials. The Secret Access Key is 40 alpha-numeric-slash-plus characters like kWcrlUX5JEDGM/LtmEENI/aVmYvHNif5zB+d9+ct and must be kept very secret.
+        </a:Explanation>
+    </a:StringInput>
+
+    <a:StringInput name="aws-queue-name">
+        <a:Explanation>AWS Queue Name -- this is the particular queue that this monitor will listen for events.
+        </a:Explanation>
+    </a:StringInput>
+
+</a:ConfigDescriptor>
