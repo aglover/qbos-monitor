@@ -55,7 +55,7 @@
 
         <copy file="${build.dir}/${ant.project.name}-${version}.jar"
               tofile="${aroar.dir}/${ant.project.name}-${version}.jar"/>
-        <copy file="conf/qbos_configDescriptor.xml" tofile="${aroar.dir}/qbos_configDescriptor.xml"/>
+        <!--<copy file="conf/qbos_configDescriptor.xml" tofile="${aroar.dir}/qbos_configDescriptor.xml"/>-->
         <copy file="conf/config.xml" tofile="${aroar.dir}/config.xml"/>
         <replace file="${aroar.dir}/config.xml">
             <replacefilter token="@ant.project.name@" value="${ant.project.name}"/>
