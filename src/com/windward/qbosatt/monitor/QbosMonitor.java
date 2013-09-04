@@ -8,6 +8,7 @@ import com.realops.common.xml.XML;
 import com.realops.foundation.adapterframework.AbstractMonitorAdapter;
 import com.realops.foundation.adapterframework.AdapterException;
 import com.realops.foundation.adapterframework.AdapterManager;
+import com.realops.foundation.adapterframework.configuration.BaseAdapterConfiguration;
 import org.apache.log4j.Logger;
 
 import java.io.StringReader;
@@ -21,15 +22,15 @@ import java.io.StringReader;
 public class QbosMonitor extends AbstractMonitorAdapter {
 
     private static Logger LOGGER = Logger.getLogger(QbosMonitor.class);
-    private QbosMonitorConfiguration configuration;
+    private BaseAdapterConfiguration configuration;
     private boolean continueToMonitor;
     private SQSAdapter ahoy;
 
     @Override
     public void initialize(AdapterManager aAdapterManager) {
         super.initialize(aAdapterManager);
-        if (getConfiguration() instanceof QbosMonitorConfiguration) {
-            configuration = (QbosMonitorConfiguration) getConfiguration();
+        if (getConfiguration() instanceof BaseAdapterConfiguration) {
+            configuration =  getConfiguration();
         }
         continueToMonitor = true;
         setState(StateEnum.STARTING);
@@ -88,10 +89,10 @@ public class QbosMonitor extends AbstractMonitorAdapter {
         try {
             if (ahoy == null) {
                 LOGGER.error("QbosMonitor AWS key: " + this.getConfiguration().getProperty("aws-key"));
-                QbosMonitorConfiguration conf = (QbosMonitorConfiguration) this.getConfiguration();
-                String queueName = conf.getAWSQueueName();
-                String awsKey = conf.getAWSKey();
-                String awsSecret = conf.getAWSSecret();
+//                QbosMonitorConfiguration conf = (QbosMonitorConfiguration) this.getConfiguration();
+                String queueName = configuration.getProperty("aws-queue-name")  ;
+                String awsKey = configuration.getProperty("aws-key")    ;
+                String awsSecret = configuration.getProperty("aws-secret");
                 ahoy = new SQSAdapter(awsKey, awsSecret, queueName);
             }
         } catch (Exception e) {
