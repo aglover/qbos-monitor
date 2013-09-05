@@ -13,6 +13,12 @@ import org.apache.log4j.Logger;
 
 import java.io.StringReader;
 
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSClient;
+import com.amazonaws.services.sqs.model.*;
+
+
 /**
  * Created with IntelliJ IDEA.
  * User: aglover
@@ -55,6 +61,7 @@ public class QbosMonitor extends AbstractMonitorAdapter {
         try {
             LOGGER.error("QbosMonitor run method invoked");
             setState(StateEnum.RUNNING);
+            LOGGER.error("QbosMonitor State is set, going to get sqs connection");
             ahoy = getSqsAdapter();
             LOGGER.error("Ahoy instance is " + ahoy + " continueToMonitor is " + continueToMonitor
                     + " and state is " + getState().toString());
@@ -96,7 +103,16 @@ public class QbosMonitor extends AbstractMonitorAdapter {
                 String queueName = configuration.getProperty("aws-queue-name");
                 String awsKey = configuration.getProperty("aws-key");
                 String awsSecret = configuration.getProperty("aws-secret");
-                ahoy = new SQSAdapter(awsKey, awsSecret, queueName);
+                LOGGER.error("Going to get ahoy matey! name "+queueName + " key " + awsKey + " secret " + awsSecret );
+                AmazonSQS sqs = new AmazonSQSClient(new BasicAWSCredentials(awsKey, awsSecret));
+                LOGGER.error("SQS worked, now trying to get queue url" + sqs.toString());
+                String queueURL = sqs.createQueue(new CreateQueueRequest(queueName)).getQueueUrl();
+                LOGGER.error("Got queue worked, now trying to ahoy" + queueURL);
+                
+                ahoy = new SQSAdapter( sqs, queueURL);
+                LOGGER.error("Ahoy is set!");
+            } else {
+              LOGGER.error("Ahoy was not null, retruning something...");
             }
         } catch (Exception e) {
             LOGGER.error("QbosMonitor Exception connecting to SQS: " + e.getLocalizedMessage(), e);
