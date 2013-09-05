@@ -23,12 +23,14 @@ public class QbosMonitorConfiguration extends BaseAdapterConfiguration {
     private final String AWS_KEY = "aws-key";
     private final String AWS_SECRET = "aws-secret";
     private final String AWS_QUEUE_NAME = "aws-queue-name";
+    private final String SLEEP_TIME = "sleep-time";
 
     public QbosMonitorConfiguration(String id, Hashtable defaults) {
         super(id, defaults);
         addValidKey(AWS_KEY);
         addValidKey(AWS_SECRET);
         addValidKey(AWS_QUEUE_NAME);
+        addValidKey(SLEEP_TIME);
     }
 
     public QbosMonitorConfiguration(String id, Hashtable defaults, Set validKeys, Set requiredKeys) throws AdapterConfigurationException {
@@ -36,6 +38,7 @@ public class QbosMonitorConfiguration extends BaseAdapterConfiguration {
         addValidKey(AWS_KEY);
         addValidKey(AWS_SECRET);
         addValidKey(AWS_QUEUE_NAME);
+        addValidKey(SLEEP_TIME);
     }
 
     public QbosMonitorConfiguration(String adapterId) {
@@ -43,6 +46,11 @@ public class QbosMonitorConfiguration extends BaseAdapterConfiguration {
         addValidKey(AWS_KEY);
         addValidKey(AWS_SECRET);
         addValidKey(AWS_QUEUE_NAME);
+        addValidKey(SLEEP_TIME);
+    }
+
+    public long getSleepTime(){
+        return getLongProperty(SLEEP_TIME).longValue();
     }
 
     public String getAWSKey() {

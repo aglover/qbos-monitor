@@ -13,11 +13,6 @@ import org.apache.log4j.Logger;
 
 import java.io.StringReader;
 
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.AmazonSQSClient;
-import com.amazonaws.services.sqs.model.*;
-
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,14 +26,21 @@ public class QbosMonitor extends AbstractMonitorAdapter {
     private BaseAdapterConfiguration configuration;
     private boolean continueToMonitor;
     private SQSAdapter ahoy;
+    private long sleepTime = 60000; // default to 1 minute
 
     @Override
     public void initialize(AdapterManager aAdapterManager) {
         super.initialize(aAdapterManager);
         configuration = getConfiguration();
         continueToMonitor = true;
+        long iSleep = 0;
+        try { iSleep = configuration.getLongProperty("sleep-time"); } catch (Exception e) {}
+        if (iSleep > 0) {
+            sleepTime = iSleep;
+        }
+
         setState(StateEnum.STARTING);
-        LOGGER.error("QbosMonitor has initialized");
+        LOGGER.debug("QbosMonitor has initialized");
     }
 
     public boolean isConfigured() {
@@ -49,7 +51,7 @@ public class QbosMonitor extends AbstractMonitorAdapter {
     public void shutdown() throws AdapterException {
         continueToMonitor = false;
         setState(StateEnum.STOPPING);
-        LOGGER.error("QbosMonitor has shutdown");
+        LOGGER.debug("QbosMonitor has shutdown");
     }
 
     public String getAdapterConfigurationClassName() {
@@ -59,66 +61,52 @@ public class QbosMonitor extends AbstractMonitorAdapter {
     @Override
     public void run() {
         try {
-            LOGGER.error("QbosMonitor run method invoked");
             setState(StateEnum.RUNNING);
-            LOGGER.error("QbosMonitor State is set, going to get sqs connection");
-            ahoy = getSqsAdapter();
-            LOGGER.error("Ahoy instance is " + ahoy + " continueToMonitor is " + continueToMonitor
-                    + " and state is " + getState().toString());
+            ahoy = getSQSAdapter();
             while (continueToMonitor && getState() == StateEnum.RUNNING) {
-                LOGGER.error("QbosMonitor is in while loop, about to invoke ahoy.receive");
                 ahoy.receive(new MessageReceivedCallback() {
                     @Override
                     public void onReceive(String id, String body) {
                         try {
-                            LOGGER.error("onReceive callback invoked! About to send event for this body: " + body);
                             sendEvent("QBos", XML.read(new StringReader(body)));
                         } catch (InvalidXMLFormatException e) {
-                            //TODO: how does one handle an error when parsing XML inside a monitor?
-                            LOGGER.error("QbosMonitor InvalidXMLFormatException! ", e);
+                            handleException("QbosMonitor InvalidXMLFormatException in onReceive", e);
                         }
                     }
                 });
 
                 try {
-                    Thread.sleep(60000); //1 minute
+                    Thread.sleep(sleepTime);
                 } catch (InterruptedException e) {
-                    LOGGER.error("Exception in run() -- bad news", e);
-                    continueToMonitor = false;
-                    setState(StateEnum.FAULT);
+                    handleException("Exception in run()/while", e);
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("QbosMonitor Exception! ", e);
+            handleException("Exception in run()", e);
         }
     }
 
-    public void setSQSAdapter(SQSAdapter instance) {
-        ahoy = instance;
+    private void handleException(String msg, Exception e) {
+        LOGGER.error(msg, e);
+        continueToMonitor = false;
+        setState(StateEnum.FAULT);
     }
 
-    private SQSAdapter getSqsAdapter() {
+    private SQSAdapter getSQSAdapter() {
         try {
             if (ahoy == null) {
                 String queueName = configuration.getProperty("aws-queue-name");
                 String awsKey = configuration.getProperty("aws-key");
                 String awsSecret = configuration.getProperty("aws-secret");
-                LOGGER.error("Going to get ahoy matey! name "+queueName + " key " + awsKey + " secret " + awsSecret );
-                AmazonSQS sqs = new AmazonSQSClient(new BasicAWSCredentials(awsKey, awsSecret));
-                LOGGER.error("SQS worked, now trying to get queue url" + sqs.toString());
-                String queueURL = sqs.createQueue(new CreateQueueRequest(queueName)).getQueueUrl();
-                LOGGER.error("Got queue worked, now trying to ahoy" + queueURL);
-                
-                ahoy = new SQSAdapter( sqs, queueURL);
-                LOGGER.error("Ahoy is set!");
-            } else {
-              LOGGER.error("Ahoy was not null, retruning something...");
+                ahoy = new SQSAdapter(awsKey, awsSecret, queueName);
             }
         } catch (Exception e) {
-            LOGGER.error("QbosMonitor Exception connecting to SQS: " + e.getLocalizedMessage(), e);
-            continueToMonitor = false;
-            setState(StateEnum.FAULT);
+            handleException("QbosMonitor Exception in getSQSAdapter", e);
         }
         return ahoy;
+    }
+
+    public void setSQSAdapter(SQSAdapter instance) {
+        ahoy = instance;
     }
 }
