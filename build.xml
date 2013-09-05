@@ -6,6 +6,7 @@
     <property name="build.test.dir" value="${build.dir}/test"/>
     <property name="classes.dir" value="${build.dir}/classes"/>
     <property name="aroar.dir" value="${build.dir}/archive/${ant.project.name}_${version}"/>
+    <property file="local.properties"/>
 
     <path id="classpath">
         <fileset dir="${lib.dir}" includes="**/*.jar"/>
@@ -55,7 +56,7 @@
 
         <copy file="${build.dir}/${ant.project.name}-${version}.jar"
               tofile="${aroar.dir}/${ant.project.name}-${version}.jar"/>
-        <!--<copy file="conf/qbos_configDescriptor.xml" tofile="${aroar.dir}/qbos_configDescriptor.xml"/>-->
+        <copy file="conf/qbos_configDescriptor.xml" tofile="${aroar.dir}/qbos_configDescriptor.xml"/>
         <copy file="conf/config.xml" tofile="${aroar.dir}/config.xml"/>
         <replace file="${aroar.dir}/config.xml">
             <replacefilter token="@ant.project.name@" value="${ant.project.name}"/>
@@ -95,9 +96,42 @@
                 <pathelement path="${build.dir}/test-classes"/>
             </classpath>
             <formatter type="xml"/>
-            <formatter type="plain" usefile="false" />
+            <formatter type="plain" usefile="false"/>
             <batchtest fork="yes" todir="./${build.dir}/">
-                <fileset dir="test/">
+                <fileset dir="test/unit">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+        <mkdir dir="./${build.dir}/reports"/>
+        <junitreport todir="./${build.dir}/reports">
+            <fileset dir="./${build.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="./${build.dir}/reports/html"/>
+        </junitreport>
+        <fail if="tests.failures"
+              message="There were JUnit failures -- see the reports in ./${build.dir}/reports"/>
+    </target>
+
+    <target name="functional-test" depends="compile-tests" description="runs JUnit tests">
+        <junit fork="true" forkmode="once" haltonfailure="false" haltonerror="false"
+               failureproperty="tests.failures" errorproperty="tests.errors"
+               includeantruntime="true" showoutput="true" printsummary="true">
+            <classpath>
+                <path refid="classpath"/>
+                <pathelement path="${classes.dir}"/>
+                <pathelement path="${build.dir}/test-classes"/>
+            </classpath>
+            <!-- see local.properties and/or default.properties -->
+            <sysproperty key="key" value="${aws.key}"/>
+            <sysproperty key="secret" value="${aws.secret}"/>
+            <sysproperty key="queue" value="${aws.queue}"/>
+
+            <formatter type="xml"/>
+            <formatter type="plain" usefile="false"/>
+            <batchtest fork="yes" todir="./${build.dir}/">
+                <fileset dir="test/functional">
                     <include name="**/*Test.java"/>
                 </fileset>
             </batchtest>
