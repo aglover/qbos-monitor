@@ -26,8 +26,8 @@ public class QBosMonitorTest {
         AmazonSQSClient mockClient = mock(AmazonSQSClient.class);
         MockSQSAdapter adapter = new MockSQSAdapter(mockClient, "test_queue");
         QbosMonitor monitor = new QbosMonitor();
-        monitor.setSQSAdapter(adapter);
         monitor.initialize(null);
+        monitor.setSQSAdapter(adapter);
         Thread t = new Thread(monitor, "QBosMonitorTesting");
         t.start();
         Thread.sleep(2000);

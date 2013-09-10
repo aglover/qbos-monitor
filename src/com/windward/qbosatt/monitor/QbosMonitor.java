@@ -33,6 +33,7 @@ public class QbosMonitor extends AbstractMonitorAdapter {
         super.initialize(aAdapterManager);
         configuration = getConfiguration();
         continueToMonitor = true;
+        ahoy = null;
         long iSleep = 0;
         try { iSleep = configuration.getLongProperty("sleep-time"); } catch (Exception e) {}
         if (iSleep > 0) {
@@ -50,6 +51,7 @@ public class QbosMonitor extends AbstractMonitorAdapter {
     @Override
     public void shutdown() throws AdapterException {
         continueToMonitor = false;
+        ahoy = null;
         setState(StateEnum.STOPPING);
         LOGGER.debug("QbosMonitor has shutdown");
     }
@@ -70,7 +72,9 @@ public class QbosMonitor extends AbstractMonitorAdapter {
                         try {
                             sendEvent("QBos", XML.read(new StringReader(body)));
                         } catch (InvalidXMLFormatException e) {
-                            handleException("QbosMonitor InvalidXMLFormatException in onReceive", e);
+                            XML event = new XML("event");
+                            event.addChild("invalid-xml").setText(body);
+                            sendEvent("qbos", event);
                         }
                     }
                 });
@@ -78,12 +82,14 @@ public class QbosMonitor extends AbstractMonitorAdapter {
                 try {
                     Thread.sleep(sleepTime);
                 } catch (InterruptedException e) {
-                    handleException("Exception in run()/while", e);
+                    LOGGER.warn("InterruptedException caught, but not setting a fault");
                 }
             }
         } catch (Exception e) {
             handleException("Exception in run()", e);
         }
+        //at the end of run, reset ahoy
+        ahoy = null;
     }
 
     private void handleException(String msg, Exception e) {
